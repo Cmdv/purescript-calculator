@@ -30,19 +30,19 @@ raiseBool = pure <<< Lit <<< Bool
 
 evalBinOp :: Env → BinOp → Expr → Expr → Expect Expr
 evalBinOp env op e1 e2 = case op of
-  Add → evalArithBinOp add env e1 e2
-  Sub → evalArithBinOp sub env e1 e2
-  Mul → evalArithBinOp mul env e1 e2
-  Div → evalArithBinOp div env e1 e2
+  Add → evalArithBinOp (add) env e1 e2
+  Sub → evalArithBinOp (sub) env e1 e2
+  Mul → evalArithBinOp (mul) env e1 e2
+  Div → evalArithBinOp (div) env e1 e2
   Or → evalOr env e1 e2
   Less → evalLess env e1 e2
   Eql → evalEql env e1 e2
 
 type EvalBinOp = Env → Expr → Expr → Expect Expr
 
-evalArithBinOp ∷ (forall s. Ring s ⇒ s → s → s) → EvalBinOp
+evalArithBinOp ∷ (forall s. Semiring s ⇒ EuclideanRing s ⇒ s → s → s) → EvalBinOp
 evalArithBinOp op env e1 e2 = case e1, e2 of
-  Lit (Int n), Lit (Int m) → raiseInt $ op e1 e2
+  Lit (Int n), Lit (Int m) → raiseInt $ op n m
   Lit t@(Bool _), _ → typeMismatch t "int"
   _, Lit t@(Bool _) → typeMismatch t "int"
   _, _ → do
